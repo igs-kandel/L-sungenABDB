@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Lösung Arbeitspläne Dezimalbrüche</title>
+<style>
+    :root{
+      --green: #d7e6c9;
+      --yellow:#f8eab3;
+      --red:   #ffbebe;
+      --ink: #111;
+      --white:#fff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--ink);
+      background: var(--white);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* App frame */
+    .app{
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding: 24px 16px 32px;
+    }
+
+    /* Pages (only active is visible) */
+    .page{
+      display:none;
+      width: min(720px, 100%);
+      flex-direction:column;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .page.active{display:flex;}
+
+    h1{
+      margin: 12px 0 0;
+      font-size: clamp(22px, 4vw, 34px);
+      text-align:center;
+      letter-spacing:.2px;
+    }
+    h2{
+      margin: 8px 0 0;
+      font-size: clamp(20px, 3.4vw, 30px);
+      text-align:center;
+      letter-spacing:.2px;
+    }
+    h3{
+      margin: 6px 0 0;
+      font-size: clamp(20px, 3.2vw, 30px);
+      text-align:center;
+      letter-spacing:.2px;
+    }
+
+    .btn{
+      width:100%;
+      border: 2px solid #000;
+      border-radius: 22px;
+      padding: 18px 18px;
+      font-size: clamp(18px, 2.8vw, 24px);
+      font-weight: 700;
+      background: var(--white);
+      color: #000;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      user-select:none;
+      touch-action: manipulation;
+      box-shadow: 0 1px 0 rgba(0,0,0,.15);
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn.big{padding: 22px 18px; border-radius: 26px;}
+    .btn.green{background: var(--green);}
+    .btn.yellow{background: var(--yellow);}
+    .btn.red{background: var(--red);}
+
+    /* Smaller buttons for book/AH tasks */
+    .btn.small{
+      padding: 14px 16px;
+      border-radius: 18px;
+      font-size: clamp(16px, 2.6vw, 22px);
+      font-weight: 700;
+    }
+
+    .stack{display:flex; flex-direction:column; gap: 14px; margin-top: 16px;}
+    .substack{display:flex; flex-direction:column; gap: 12px; margin-top: 10px;}
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .back{
+      border: 2px solid #000;
+      background: rgba(255,255,255,.7);
+      border-radius: 16px;
+      padding: 10px 12px;
+      font-weight: 800;
+      cursor:pointer;
+      touch-action: manipulation;
+      width: fit-content;
+    }
+    .back:active{transform: translateY(1px)}
+
+    .hint{
+      text-align:center;
+      font-size: 14px;
+      opacity:.75;
+      margin-top: 2px;
+    }
+
+    /* Background colors */
+    body.bg-green{background: var(--green);}
+    body.bg-yellow{background: var(--yellow);}
+    body.bg-red{background: var(--red);}
+    body.bg-white{background: var(--white);}
+
+    /* Simple "cards" spacing for AP1 topic pages like screenshot */
+    .topic-card{
+      background: rgba(255,255,255,.35);
+      border-radius: 22px;
+      padding: 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .topic-title{
+      font-weight: 900;
+      text-align:center;
+      font-size: clamp(22px, 3.8vw, 34px);
+      margin: 0;
+    }
+  
+    /* Rahmen-Farben für Lösungsbilder */
+    .solution-img{
+      max-width:100%;
+      height:auto;
+      border-radius: 14px;
+      display:block;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+    .solution-img.frame-or{
+      border: 12px solid #ff8a00; /* kräftiges Orange */
+    }
+    .solution-img.frame-gr{
+      border: 12px solid #9be79b; /* hellgrün */
+    }
+
+</style>
+</head>
+<body class="bg-white">
+<main class="app">
+<!-- Start Page -->
+<section aria-label="Startseite" class="page active" id="startPage">
+<h1>Lösung Arbeitspläne Dezimalbrüche</h1>
+<div class="stack">
+<button class="btn big green" data-open="plan1">Arbeitsplan 1</button>
+<button class="btn big yellow" data-open="plan2">Arbeitsplan 2</button>
+<button class="btn big red" data-open="plan3">Arbeitsplan 3</button>
+</div>
+</section>
+<!-- Plan 1 -->
+<section aria-label="Arbeitsplan 1" class="page" id="plan1">
+<div class="topbar">
+<button class="back" data-back-target="startPage">← zurück</button>
+</div>
+<h2>Lösung  Arbeitsplan 1</h2>
+<div class="substack">
+<button class="btn" data-open="ap1_dezimalschreibweise">Dezimalschreibweise</button>
+<button class="btn" data-open="ap1_vergleichen_ordnen">Dezimalbrüche vergleichen und ordnen</button>
+<button class="btn" data-open="ap1_runden">Dezimalbrüche runden</button>
+<button class="btn" data-open="ap1_brueche_zu_dezimal">Umwandeln von Brüchen in Dezimalbrüche</button>
+<button class="btn" data-open="ap1_mix">Dezimalbrüche, Brüche, Prozent</button>
+</div>
+<div class="hint">In Schritt 2 füllen wir diese 15 Buttons mit Inhalt.</div>
+</section>
+<!-- Plan 2 -->
+<section aria-label="Arbeitsplan 2" class="page" id="plan2">
+<div class="topbar">
+<button class="back" data-back-target="startPage">← zurück</button>
+</div>
+<h2>Lösung  Arbeitsplan 2</h2>
+<div class="substack">
+<button class="btn" data-open="ap2_dezimalschreibweise">Dezimalschreibweise</button>
+<button class="btn" data-open="ap2_vergleichen_ordnen">Dezimalbrüche vergleichen und ordnen</button>
+<button class="btn" data-open="ap2_runden">Dezimalbrüche runden</button>
+<button class="btn" data-open="ap2_brueche_zu_dezimal">Umwandeln von Brüchen in Dezimalbrüche</button>
+<button class="btn" data-open="ap2_mix">Dezimalbrüche, Brüche, Prozent</button>
+</div>
+<div class="hint">In Schritt 2 füllen wir diese 15 Buttons mit Inhalt.</div>
+</section>
+<!-- Plan 3 -->
+<section aria-label="Arbeitsplan 3" class="page" id="plan3">
+<div class="topbar">
+<button class="back" data-back-target="startPage">← zurück</button>
+</div>
+<h2>Lösung  Arbeitsplan 3</h2>
+<div class="substack">
+<button class="btn" data-open="ap3_dezimalschreibweise">Dezimalschreibweise</button>
+<button class="btn" data-open="ap3_vergleichen_ordnen">Dezimalbrüche vergleichen und ordnen</button>
+<button class="btn" data-open="ap3_runden">Dezimalbrüche runden</button>
+<button class="btn" data-open="ap3_brueche_zu_dezimal">Umwandeln von Brüchen in Dezimalbrüche</button>
+<button class="btn" data-open="ap3_mix">Dezimalbrüche, Brüche, Prozent</button>
+</div>
+<div class="hint">In Schritt 2 füllen wir diese 15 Buttons mit Inhalt.</div>
+</section>
+<!-- ========================= -->
+<!-- Arbeitsplan 1: Themen-Seiten (mit Buttons aus Screenshot) -->
+<!-- ========================= -->
+<!-- AP1: Dezimalschreibweise -->
+<section aria-label="AP1 Dezimalschreibweise" class="page" id="ap1_dezimalschreibweise">
+<div class="topbar"><button class="back" data-back-target="plan1">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalschreibweise</div>
+<button class="btn small" data-open="ap1_ds_ah34_1">AH S. 34 Nr. 1</button>
+<button class="btn small" data-open="ap1_ds_ah34_2">AH S. 34 Nr. 2</button>
+</div>
+</section>
+<!-- AP1: Vergleichen & ordnen -->
+<section aria-label="AP1 Vergleichen und ordnen" class="page" id="ap1_vergleichen_ordnen">
+<div class="topbar"><button class="back" data-back-target="plan1">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalbrüche vergleichen und ordnen</div>
+<button class="btn small" data-open="ap1_vo_b97_1">Buch S. 97 Nr. 1</button>
+<button class="btn small" data-open="ap1_vo_b97_2">Buch S. 97 Nr. 2</button>
+<button class="btn small" data-open="ap1_vo_b98_a">Buch S. 98 Nr. A</button>
+<button class="btn small" data-open="ap1_vo_b98_b">Buch S. 98 Nr. B</button>
+<button class="btn small" data-open="ap1_vo_ah35_3">AH S. 35 Nr. 3</button>
+</div>
+</section>
+<!-- AP1: Runden -->
+<section aria-label="AP1 Runden" class="page" id="ap1_runden">
+<div class="topbar"><button class="back" data-back-target="plan1">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalbrüche runden</div>
+<button class="btn small" data-open="ap1_ru_b100_1">Buch S. 100 Nr. 1</button>
+<button class="btn small" data-open="ap1_ru_b100_2">Buch S. 100 Nr. 2</button>
+<button class="btn small" data-open="ap1_ru_b101_a">Buch S. 101 Nr. A</button>
+<button class="btn small" data-open="ap1_ru_b101_3or">Buch S. 101 Nr. 3 or.</button>
+</div>
+</section>
+<!-- AP1: Brüche -> Dezimalbrüche -->
+<section aria-label="AP1 Brüche in Dezimalbrüche umwandeln" class="page" id="ap1_brueche_zu_dezimal">
+<div class="topbar"><button class="back" data-back-target="plan1">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Umwandeln von Brüchen in Dezimalbrüche</div>
+<button class="btn small" data-open="ap1_bd_b102_1">Buch S. 102 Nr. 1</button>
+<button class="btn small" data-open="ap1_bd_b103_2">Buch S. 103 Nr. 2</button>
+<button class="btn small" data-open="ap1_bd_b104_a">Buch S. 104 Nr. A</button>
+</div>
+</section>
+<!-- AP1: Mix -->
+<section aria-label="AP1 Dezimalbrüche, Brüche, Prozent" class="page" id="ap1_mix">
+<div class="topbar"><button class="back" data-back-target="plan1">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalbrüche, Brüche, Prozent</div>
+<button class="btn small" data-open="ap1_mx_b106_1">Buch S. 106 Nr. 1</button>
+<button class="btn small" data-open="ap1_mx_b106_2">Buch S. 106 Nr. 2</button>
+<button class="btn small" data-open="ap1_mx_b106_3">Buch S. 106 Nr. 3</button>
+<button class="btn small" data-open="ap1_mx_b107_4">Buch S. 107 Nr. 4</button>
+</div>
+</section>
+<!-- ========================= -->
+<!-- AP1: Unterseiten (erstmal leer, nur Zurück) -->
+<!-- ========================= -->
+<!-- Dezimalschreibweise -->
+<section aria-label="AP1 AH S34 Nr1" class="page" id="ap1_ds_ah34_1">
+<div class="topbar"><button class="back" data-back-target="ap1_dezimalschreibweise">← zurück</button></div><img alt="AH34_Nr1" class="solution-img" src="images/AH34_Nr1.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 AH S34 Nr2" class="page" id="ap1_ds_ah34_2">
+<div class="topbar"><button class="back" data-back-target="ap1_dezimalschreibweise">← zurück</button></div><img alt="AH34_Nr2" class="solution-img" src="images/AH34_Nr2.png" style="max-width:100%;height:auto;"/>
+</section>
+<!-- Vergleichen & ordnen -->
+<section aria-label="AP1 Buch S97 Nr1" class="page" id="ap1_vo_b97_1">
+<div class="topbar"><button class="back" data-back-target="ap1_vergleichen_ordnen">← zurück</button></div><img alt="B97_Nr1" class="solution-img" src="images/B97_Nr1.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 Buch S97 Nr2" class="page" id="ap1_vo_b97_2">
+<div class="topbar"><button class="back" data-back-target="ap1_vergleichen_ordnen">← zurück</button></div><img alt="B97_Nr2" class="solution-img" src="images/B97_Nr2.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 Buch S98 NrA" class="page" id="ap1_vo_b98_a">
+<div class="topbar"><button class="back" data-back-target="ap1_vergleichen_ordnen">← zurück</button></div><img alt="B98_NrA" class="solution-img" src="images/B98_NrA.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 Buch S98 NrB" class="page" id="ap1_vo_b98_b">
+<div class="topbar"><button class="back" data-back-target="ap1_vergleichen_ordnen">← zurück</button></div><img alt="B98_NrB" class="solution-img" src="images/B98_NrB.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 AH S35 Nr3" class="page" id="ap1_vo_ah35_3">
+<div class="topbar"><button class="back" data-back-target="ap1_vergleichen_ordnen">← zurück</button></div><img alt="AH35_Nr3" class="solution-img" src="images/AH35_Nr3.png" style="max-width:100%;height:auto;"/>
+</section>
+<!-- Runden -->
+<section aria-label="AP1 Buch S100 Nr1" class="page" id="ap1_ru_b100_1">
+<div class="topbar"><button class="back" data-back-target="ap1_runden">← zurück</button></div><img alt="B100_Nr1" class="solution-img" src="images/B100_Nr1.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 Buch S100 Nr2" class="page" id="ap1_ru_b100_2">
+<div class="topbar"><button class="back" data-back-target="ap1_runden">← zurück</button></div><img alt="B100_Nr2" class="solution-img" src="images/B100_Nr2.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 Buch S101 NrA" class="page" id="ap1_ru_b101_a">
+<div class="topbar"><button class="back" data-back-target="ap1_runden">← zurück</button></div><img alt="B101_NrA" class="solution-img" src="images/B101_NrA.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 Buch S101 Nr3or" class="page" id="ap1_ru_b101_3or">
+<div class="topbar"><button class="back" data-back-target="ap1_runden">← zurück</button></div><img alt="B101_Nr3_or" class="solution-img frame-or" src="images/B101_Nr3_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<!-- Brüche -> Dezimal -->
+<section aria-label="AP1 Buch S102 Nr1" class="page" id="ap1_bd_b102_1">
+<div class="topbar"><button class="back" data-back-target="ap1_brueche_zu_dezimal">← zurück</button></div><img alt="B102_Nr1" class="solution-img" src="images/B102_Nr1.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 Buch S103 Nr2" class="page" id="ap1_bd_b103_2">
+<div class="topbar"><button class="back" data-back-target="ap1_brueche_zu_dezimal">← zurück</button></div><img alt="B103_Nr2" class="solution-img" src="images/B103_Nr2.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 Buch S104 NrA" class="page" id="ap1_bd_b104_a">
+<div class="topbar"><button class="back" data-back-target="ap1_brueche_zu_dezimal">← zurück</button></div><img alt="B104_NrA" class="solution-img" src="images/B104_NrA.png" style="max-width:100%;height:auto;"/>
+</section>
+<!-- Mix -->
+<section aria-label="AP1 Buch S106 Nr1" class="page" id="ap1_mx_b106_1">
+<div class="topbar"><button class="back" data-back-target="ap1_mix">← zurück</button></div><img alt="B106_Nr1" class="solution-img" src="images/B106_Nr1.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 Buch S106 Nr2" class="page" id="ap1_mx_b106_2">
+<div class="topbar"><button class="back" data-back-target="ap1_mix">← zurück</button></div><img alt="B106_Nr2" class="solution-img" src="images/B106_Nr2.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 Buch S106 Nr3" class="page" id="ap1_mx_b106_3">
+<div class="topbar"><button class="back" data-back-target="ap1_mix">← zurück</button></div><img alt="B106_Nr3" class="solution-img" src="images/B106_Nr3.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP1 Buch S107 Nr4" class="page" id="ap1_mx_b107_4">
+<div class="topbar"><button class="back" data-back-target="ap1_mix">← zurück</button></div><img alt="B107_Nr4" class="solution-img" src="images/B107_Nr4.png" style="max-width:100%;height:auto;"/>
+</section>
+<!-- ========================= -->
+<!-- AP2: Unterseiten (erstmal leer, nur Zurück) -->
+<!-- ========================= -->
+<section aria-label="AP2 Buch S95 Nr6 or" class="page" id="ap2_ds_b95_6or">
+<div class="topbar"><button class="back" data-back-target="ap2_dezimalschreibweise">← zurück</button></div><img alt="B95_Nr6_or" class="solution-img frame-or" src="images/B95_Nr6_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S95 Nr5 gr" class="page" id="ap2_ds_b95_5gr">
+<div class="topbar"><button class="back" data-back-target="ap2_dezimalschreibweise">← zurück</button></div><img alt="B95_Nr5_gr" class="solution-img frame-gr" src="images/B95_Nr5_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S95 Nr6 gr" class="page" id="ap2_ds_b95_6gr">
+<div class="topbar"><button class="back" data-back-target="ap2_dezimalschreibweise">← zurück</button></div><img alt="B95_Nr6_gr" class="solution-img frame-gr" src="images/B95_Nr6_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S98 Nr5 or" class="page" id="ap2_vo_b98_5or">
+<div class="topbar"><button class="back" data-back-target="ap2_vergleichen_ordnen">← zurück</button></div><img alt="B98_Nr5_or" class="solution-img frame-or" src="images/B98_Nr5_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S98 Nr4 gr" class="page" id="ap2_vo_b98_4gr">
+<div class="topbar"><button class="back" data-back-target="ap2_vergleichen_ordnen">← zurück</button></div><img alt="B98_Nr4_gr" class="solution-img frame-gr" src="images/B98_Nr4_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S98 Nr5 gr" class="page" id="ap2_vo_b98_5gr">
+<div class="topbar"><button class="back" data-back-target="ap2_vergleichen_ordnen">← zurück</button></div><img alt="B98_Nr5_gr" class="solution-img frame-gr" src="images/B98_Nr5_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S99 Nr7 or" class="page" id="ap2_vo_b99_7or">
+<div class="topbar"><button class="back" data-back-target="ap2_vergleichen_ordnen">← zurück</button></div><img alt="B99_Nr7_or" class="solution-img frame-or" src="images/B99_Nr7_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S99 Nr8 or" class="page" id="ap2_vo_b99_8or">
+<div class="topbar"><button class="back" data-back-target="ap2_vergleichen_ordnen">← zurück</button></div><img alt="B99_Nr8_or" class="solution-img frame-or" src="images/B99_Nr8_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S101 Nr5 or" class="page" id="ap2_ru_b101_5or">
+<div class="topbar"><button class="back" data-back-target="ap2_runden">← zurück</button></div><img alt="B101_Nr5_or" class="solution-img frame-or" src="images/B101_Nr5_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S101 Nr3 gr" class="page" id="ap2_ru_b101_3gr">
+<div class="topbar"><button class="back" data-back-target="ap2_runden">← zurück</button></div><img alt="B101_Nr3_gr" class="solution-img frame-gr" src="images/B101_Nr3_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S101 Nr5 gr" class="page" id="ap2_ru_b101_5gr">
+<div class="topbar"><button class="back" data-back-target="ap2_runden">← zurück</button></div><img alt="B101_Nr5_gr" class="solution-img frame-gr" src="images/B101_Nr5_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S103 Nr3" class="page" id="ap2_bd_b103_3">
+<div class="topbar"><button class="back" data-back-target="ap2_brueche_zu_dezimal">← zurück</button></div><img alt="B103_Nr3" class="solution-img" src="images/B103_Nr3.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S103 Nr6 or" class="page" id="ap2_bd_b103_6or">
+<div class="topbar"><button class="back" data-back-target="ap2_brueche_zu_dezimal">← zurück</button></div><img alt="B103_Nr6_or" class="solution-img frame-or" src="images/B103_Nr6_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S103 Nr8 gr" class="page" id="ap2_bd_b103_8gr">
+<div class="topbar"><button class="back" data-back-target="ap2_brueche_zu_dezimal">← zurück</button></div><img alt="B103_Nr8_gr" class="solution-img frame-gr" src="images/B103_Nr8_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S104 Nr9 or" class="page" id="ap2_bd_b104_9or">
+<div class="topbar"><button class="back" data-back-target="ap2_brueche_zu_dezimal">← zurück</button></div><img alt="B104_Nr9_or" class="solution-img frame-or" src="images/B104_Nr9_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S107 Nr5 gr" class="page" id="ap2_mx_b107_5gr">
+<div class="topbar"><button class="back" data-back-target="ap2_mix">← zurück</button></div><img alt="B107_Nr5_gr" class="solution-img frame-gr" src="images/B107_Nr5_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S107 Nr7 gr" class="page" id="ap2_mx_b107_7gr">
+<div class="topbar"><button class="back" data-back-target="ap2_mix">← zurück</button></div><img alt="B107_Nr7_gr" class="solution-img frame-gr" src="images/B107_Nr7_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S107 Nr8 or" class="page" id="ap2_mx_b107_8or">
+<div class="topbar"><button class="back" data-back-target="ap2_mix">← zurück</button></div><img alt="B107_Nr8_or" class="solution-img frame-or" src="images/B107_Nr8_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP2 Buch S108 Nr8 gr" class="page" id="ap2_mx_b108_8gr">
+<div class="topbar"><button class="back" data-back-target="ap2_mix">← zurück</button></div><img alt="B108_Nr8_gr" class="solution-img frame-gr" src="images/B108_Nr8_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<!-- ========================= -->
+<!-- AP3: Unterseiten (erstmal leer, nur Zurück) -->
+<!-- ========================= -->
+<section aria-label="AP3 Buch S96 Nr8 or" class="page" id="ap3_ds_b96_8or">
+<div class="topbar"><button class="back" data-back-target="ap3_dezimalschreibweise">← zurück</button></div><img alt="B96_Nr8_or" class="solution-img frame-or" src="images/B96_Nr8_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S96 Nr10 or" class="page" id="ap3_ds_b96_10or">
+<div class="topbar"><button class="back" data-back-target="ap3_dezimalschreibweise">← zurück</button></div><img alt="B96_Nr10_or" class="solution-img frame-or" src="images/B96_Nr10_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S96 Nr12 gr" class="page" id="ap3_ds_b96_12gr">
+<div class="topbar"><button class="back" data-back-target="ap3_dezimalschreibweise">← zurück</button></div><img alt="B96_Nr12_gr" class="solution-img frame-gr" src="images/B96_Nr12_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S112 Nr20" class="page" id="ap3_ds_b112_20">
+<div class="topbar"><button class="back" data-back-target="ap3_dezimalschreibweise">← zurück</button></div><img alt="B112_Nr20" class="solution-img" src="images/B112_Nr20.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 AH S34 Nr3" class="page" id="ap3_ds_ah34_3">
+<div class="topbar"><button class="back" data-back-target="ap3_dezimalschreibweise">← zurück</button></div><img alt="AH34_Nr3" class="solution-img" src="images/AH34_Nr3.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 AH S34 Nr5" class="page" id="ap3_ds_ah34_5">
+<div class="topbar"><button class="back" data-back-target="ap3_dezimalschreibweise">← zurück</button></div><img alt="AH34_Nr5" class="solution-img" src="images/AH34_Nr5.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S99 Nr9 or" class="page" id="ap3_vo_b99_9or">
+<div class="topbar"><button class="back" data-back-target="ap3_vergleichen_ordnen">← zurück</button></div><img alt="B99_Nr9_or" class="solution-img frame-or" src="images/B99_Nr9_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S99 Nr9a gr" class="page" id="ap3_vo_b99_9a_gr">
+<div class="topbar"><button class="back" data-back-target="ap3_vergleichen_ordnen">← zurück</button></div><img alt="B99_Nr9a_gr" class="solution-img frame-gr" src="images/B99_Nr9a_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S99 Nr10 gr" class="page" id="ap3_vo_b99_10gr">
+<div class="topbar"><button class="back" data-back-target="ap3_vergleichen_ordnen">← zurück</button></div><img alt="B99_Nr10_gr" class="solution-img frame-gr" src="images/B99_Nr10_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S112 Nr26" class="page" id="ap3_vo_b112_26">
+<div class="topbar"><button class="back" data-back-target="ap3_vergleichen_ordnen">← zurück</button></div><img alt="B112_Nr26" class="solution-img" src="images/B112_Nr26.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 AH S35 Nr5 plus" class="page" id="ap3_vo_ah35_5plus">
+<div class="topbar"><button class="back" data-back-target="ap3_vergleichen_ordnen">← zurück</button></div><img alt="AH35_Nr5plus" class="solution-img" src="images/AH35_Nr5plus.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 AH S35 Nr7" class="page" id="ap3_vo_ah35_7">
+<div class="topbar"><button class="back" data-back-target="ap3_vergleichen_ordnen">← zurück</button></div><img alt="AH35_Nr7" class="solution-img" src="images/AH35_Nr7.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S101 Nr4 gr" class="page" id="ap3_ru_b101_4gr">
+<div class="topbar"><button class="back" data-back-target="ap3_runden">← zurück</button></div><img alt="B101_Nr4_gr" class="solution-img frame-gr" src="images/B101_Nr4_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S101 Nr6 or" class="page" id="ap3_ru_b101_6or">
+<div class="topbar"><button class="back" data-back-target="ap3_runden">← zurück</button></div><img alt="B101_Nr6_or" class="solution-img frame-or" src="images/B101_Nr6_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S101 Nr6 gr" class="page" id="ap3_ru_b101_6gr">
+<div class="topbar"><button class="back" data-back-target="ap3_runden">← zurück</button></div><img alt="B101_Nr6_gr" class="solution-img frame-gr" src="images/B101_Nr6_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S112 Nr23" class="page" id="ap3_ru_b112_23">
+<div class="topbar"><button class="back" data-back-target="ap3_runden">← zurück</button></div><img alt="B112_Nr23" class="solution-img" src="images/B112_Nr23.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S103 Nr7 or" class="page" id="ap3_bd_b103_7or">
+<div class="topbar"><button class="back" data-back-target="ap3_brueche_zu_dezimal">← zurück</button></div><img alt="B103_Nr7_or" class="solution-img frame-or" src="images/B103_Nr7_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S103 Nr7 gr" class="page" id="ap3_bd_b103_7gr">
+<div class="topbar"><button class="back" data-back-target="ap3_brueche_zu_dezimal">← zurück</button></div><img alt="B103_Nr7_gr" class="solution-img frame-gr" src="images/B103_Nr7_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S104 Nr10 gr" class="page" id="ap3_bd_b104_10gr">
+<div class="topbar"><button class="back" data-back-target="ap3_brueche_zu_dezimal">← zurück</button></div><img alt="B104_Nr10_gr" class="solution-img frame-gr" src="images/B104_Nr10_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S104 Nr14 gr" class="page" id="ap3_bd_b104_14gr">
+<div class="topbar"><button class="back" data-back-target="ap3_brueche_zu_dezimal">← zurück</button></div><img alt="B104_Nr14_gr" class="solution-img frame-gr" src="images/B104_Nr14_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 AH S36 Nr6" class="page" id="ap3_bd_ah36_6">
+<div class="topbar"><button class="back" data-back-target="ap3_brueche_zu_dezimal">← zurück</button></div><img alt="AH36_Nr6" class="solution-img" src="images/AH36_Nr6.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S108 Nr9 gr" class="page" id="ap3_mx_b108_9gr">
+<div class="topbar"><button class="back" data-back-target="ap3_mix">← zurück</button></div><img alt="B108_Nr9_gr" class="solution-img frame-gr" src="images/B108_Nr9_gr.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S108 Nr12 or" class="page" id="ap3_mx_b108_12or">
+<div class="topbar"><button class="back" data-back-target="ap3_mix">← zurück</button></div><img alt="B108_Nr12_or" class="solution-img frame-or" src="images/B108_Nr12_or.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S113 Nr30" class="page" id="ap3_mx_b113_30">
+<div class="topbar"><button class="back" data-back-target="ap3_mix">← zurück</button></div><img alt="B113_Nr30" class="solution-img" src="images/B113_Nr30.png" style="max-width:100%;height:auto;"/>
+</section>
+<section aria-label="AP3 Buch S113 Nr33" class="page" id="ap3_mx_b113_33">
+<div class="topbar"><button class="back" data-back-target="ap3_mix">← zurück</button></div><img alt="B113_Nr33" class="solution-img" src="images/B113_Nr33.png" style="max-width:100%;height:auto;"/>
+</section>
+<!-- ========================= -->
+<!-- Arbeitsplan 2 & 3: weiterhin leere Themen-Seiten (nur Zurück) -->
+<!-- ========================= -->
+<!-- Arbeitsplan 2 -->
+<section aria-label="AP2 Dezimalschreibweise" class="page" id="ap2_dezimalschreibweise">
+<div class="topbar"><button class="back" data-back-target="plan2">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalschreibweise</div>
+<button class="btn small" data-open="ap2_ds_b95_6or">Buch S. 95 Nr. 6 or</button>
+<button class="btn small" data-open="ap2_ds_b95_5gr">Buch S. 95 Nr. 5 gr</button>
+<button class="btn small" data-open="ap2_ds_b95_6gr">Buch S. 95 Nr. 6 gr</button>
+</div>
+</section>
+<section aria-label="AP2 Vergleichen und ordnen" class="page" id="ap2_vergleichen_ordnen">
+<div class="topbar"><button class="back" data-back-target="plan2">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalbrüche vergleichen und ordnen</div>
+<button class="btn small" data-open="ap2_vo_b98_5or">Buch S. 98 Nr. 5 or.</button>
+<button class="btn small" data-open="ap2_vo_b98_4gr">Buch S. 98 Nr. 4 gr.</button>
+<button class="btn small" data-open="ap2_vo_b98_5gr">Buch S. 98 Nr. 5 gr.</button>
+<button class="btn small" data-open="ap2_vo_b99_7or">Buch S. 99 Nr. 7 or.</button>
+<button class="btn small" data-open="ap2_vo_b99_8or">Buch S. 99 Nr. 8 or</button>
+</div>
+</section>
+<section aria-label="AP2 Runden" class="page" id="ap2_runden">
+<div class="topbar"><button class="back" data-back-target="plan2">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalbrüche runden</div>
+<button class="btn small" data-open="ap2_ru_b101_5or">Buch S. 101 Nr. 5 or.</button>
+<button class="btn small" data-open="ap2_ru_b101_3gr">Buch S. 101 Nr. 3 gr.</button>
+<button class="btn small" data-open="ap2_ru_b101_5gr">Buch S. 101 Nr. 5 gr.</button>
+</div>
+</section>
+<section aria-label="AP2 Brüche zu Dezimal" class="page" id="ap2_brueche_zu_dezimal">
+<div class="topbar"><button class="back" data-back-target="plan2">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Umwandeln von Brüchen in Dezimalbrüche</div>
+<button class="btn small" data-open="ap2_bd_b103_3">Buch S. 103 Nr. 3</button>
+<button class="btn small" data-open="ap2_bd_b103_6or">Buch S. 103 Nr. 6 or.</button>
+<button class="btn small" data-open="ap2_bd_b103_8gr">Buch S. 103 Nr. 8 gr.</button>
+<button class="btn small" data-open="ap2_bd_b104_9or">Buch S. 104 Nr. 9 or.</button>
+</div>
+</section>
+<section aria-label="AP2 Mix" class="page" id="ap2_mix">
+<div class="topbar"><button class="back" data-back-target="plan2">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalbrüche, Brüche, Prozent</div>
+<button class="btn small" data-open="ap2_mx_b107_5gr">Buch S. 107 Nr. 5 gr.</button>
+<button class="btn small" data-open="ap2_mx_b107_7gr">Buch S. 107 Nr. 7 gr.</button>
+<button class="btn small" data-open="ap2_mx_b107_8or">Buch S. 107 Nr. 8 or.</button>
+<button class="btn small" data-open="ap2_mx_b108_8gr">Buch S. 108 Nr. 8 gr.</button>
+</div>
+</section>
+<!-- Arbeitsplan 3 -->
+<section aria-label="AP3 Dezimalschreibweise" class="page" id="ap3_dezimalschreibweise">
+<div class="topbar"><button class="back" data-back-target="plan3">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalschreibweise</div>
+<button class="btn small" data-open="ap3_ds_b96_8or">Buch S. 96 Nr. 8 or.</button>
+<button class="btn small" data-open="ap3_ds_b96_10or">Buch S. 96 Nr. 10 or.</button>
+<button class="btn small" data-open="ap3_ds_b96_12gr">Buch S. 96 Nr. 12 gr.</button>
+<button class="btn small" data-open="ap3_ds_b112_20">Buch S. 112 Nr. 20</button>
+<button class="btn small" data-open="ap3_ds_ah34_3">AH. S. 34 Nr. 3</button>
+<button class="btn small" data-open="ap3_ds_ah34_5">AH S. 34 Nr. 5</button>
+</div>
+</section>
+<section aria-label="AP3 Vergleichen und ordnen" class="page" id="ap3_vergleichen_ordnen">
+<div class="topbar"><button class="back" data-back-target="plan3">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalbrüche vergleichen und ordnen</div>
+<button class="btn small" data-open="ap3_vo_b99_9or">Buch S. 99 Nr. 9 or.</button>
+<button class="btn small" data-open="ap3_vo_b99_9a_gr">Buch S. 99 Nr. 9a) gr.</button>
+<button class="btn small" data-open="ap3_vo_b99_10gr">Buch S. 99 Nr. 10 gr.</button>
+<button class="btn small" data-open="ap3_vo_b112_26">Buch S. 112 Nr. 26</button>
+<button class="btn small" data-open="ap3_vo_ah35_5plus">AH. S. 35 Nr. 5 +</button>
+<button class="btn small" data-open="ap3_vo_ah35_7">AH S. 35 Nr. 7</button>
+</div>
+</section>
+<section aria-label="AP3 Runden" class="page" id="ap3_runden">
+<div class="topbar"><button class="back" data-back-target="plan3">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalbrüche runden</div>
+<button class="btn small" data-open="ap3_ru_b101_4gr">Buch S. 101 Nr. 4 gr.</button>
+<button class="btn small" data-open="ap3_ru_b101_6or">Buch S. 101 Nr. 6 or.</button>
+<button class="btn small" data-open="ap3_ru_b101_6gr">Buch S. 101 6 gr.</button>
+<button class="btn small" data-open="ap3_ru_b112_23">Buch S. 112 Nr. 23</button>
+</div>
+</section>
+<section aria-label="AP3 Brüche zu Dezimal" class="page" id="ap3_brueche_zu_dezimal">
+<div class="topbar"><button class="back" data-back-target="plan3">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Umwandeln von Brüchen in Dezimalbrüche</div>
+<button class="btn small" data-open="ap3_bd_b103_7or">Buch S. 103 Nr. 7 or.</button>
+<button class="btn small" data-open="ap3_bd_b103_7gr">Buch S. 103 Nr. 7 gr.</button>
+<button class="btn small" data-open="ap3_bd_b104_10gr">Buch S. 104 10 gr.</button>
+<button class="btn small" data-open="ap3_bd_b104_14gr">Buch S. 104 14 gr.</button>
+<button class="btn small" data-open="ap3_bd_ah36_6">AH S. 36 Nr. 6</button>
+</div>
+</section>
+<section aria-label="AP3 Mix" class="page" id="ap3_mix">
+<div class="topbar"><button class="back" data-back-target="plan3">← zurück</button></div>
+<div class="topic-card">
+<div class="topic-title">Dezimalbrüche, Brüche, Prozent</div>
+<button class="btn small" data-open="ap3_mx_b108_9gr">Buch S. 108 Nr. 9 gr.</button>
+<button class="btn small" data-open="ap3_mx_b108_12or">Buch S. 108 Nr. 12 or.</button>
+<button class="btn small" data-open="ap3_mx_b113_30">Buch S. 113 Nr. 30</button>
+<button class="btn small" data-open="ap3_mx_b113_33">Buch S. 113 Nr. 33</button>
+</div>
+</section>
+<!-- ========================= -->
+<!-- AP3: Unterseiten (leer, nur Zurück) -->
+<!-- ========================= -->
+
+
+
+
+
+
+
+<section class="page" id="ap3_vo_b99_9agr"><div class="topbar"><button class="back" data-back-target="ap3_vergleichen_ordnen">← zurück</button></div><img alt="B99_Nr9a_gr" class="solution-img frame-gr" src="images/B99_Nr9a_gr.png" style="max-width:100%;height:auto;"/></section>
+
+
+<section class="page" id="ap3_vo_ah35_5p"><div class="topbar"><button class="back" data-back-target="ap3_vergleichen_ordnen">← zurück</button></div><img alt="AH35_Nr5plus" class="solution-img" src="images/AH35_Nr5plus.png" style="max-width:100%;height:auto;"/></section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="page" id="ap3_mx_b113_35"><div class="topbar"><button class="back" data-back-target="ap3_mix">← zurück</button></div><img alt="B113_Nr35" class="solution-img" src="images/B113_Nr35.png" style="max-width:100%;height:auto;"/></section>
+</main>
+<script>
+    const pageEls = Array.from(document.querySelectorAll(".page"));
+
+    function bgForPage(id){
+      if(id.startsWith("plan1") || id.startsWith("ap1_")) return "bg-green";
+      if(id.startsWith("plan2") || id.startsWith("ap2_")) return "bg-yellow";
+      if(id.startsWith("plan3") || id.startsWith("ap3_")) return "bg-red";
+      return "bg-white";
+    }
+
+    function showPage(id){
+      pageEls.forEach(p => p.classList.toggle("active", p.id === id));
+      document.body.classList.remove("bg-white","bg-green","bg-yellow","bg-red");
+      document.body.classList.add(bgForPage(id));
+      window.scrollTo({top:0, behavior:"instant"});
+    }
+
+    // Open any target page
+    document.querySelectorAll("[data-open]").forEach(btn=>{
+      btn.addEventListener("click", () => showPage(btn.getAttribute("data-open")));
+      btn.addEventListener("touchstart", () => {}, {passive:true});
+    });
+
+    // Back buttons with explicit targets
+    document.querySelectorAll("[data-back-target]").forEach(btn=>{
+      btn.addEventListener("click", () => showPage(btn.getAttribute("data-back-target")));
+      btn.addEventListener("touchstart", () => {}, {passive:true});
+    });
+  </script>
+</body>
+</html>
